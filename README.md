@@ -1,5 +1,3 @@
-# IndeedJobAnalyzer
-
 <br />
 <p align="center">
 
