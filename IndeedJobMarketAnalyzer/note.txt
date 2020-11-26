@@ -1,0 +1,9 @@
+Task - make a new task ,each task will have a progress , the task can be resume aftet each time it fails or interrupped
+
+since Indeed may be changed at any time ,in the event of resume, only unsaved job id will be processed
+
+incompleted task will be saved in a local file
+
+Report - a static report will be generatored after task has completed
+
+Analyzer - 

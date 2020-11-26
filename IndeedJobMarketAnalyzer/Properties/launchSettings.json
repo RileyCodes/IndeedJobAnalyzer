@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "IndeedJobMarketAnalyzer": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    }
+  }
+}
