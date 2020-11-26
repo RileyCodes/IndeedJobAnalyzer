@@ -51,3 +51,9 @@ IndeedJobAnalyzer come with two simple features:
 
 * web crawler - it downloads the job name, company name ,job description and its url and store it in your local disk in JSON, called `Task File`
 * report generator - generates statistics report from selected `Task File` based on your setting to help your better understanding your local job market.
+
+
+## Architecture
+<img src="images/Architecture.png" alt="Logo">
+
+
