@@ -7,9 +7,9 @@
   <p align="center">
     A web crawler and report generator made for data-driven carrier planning.
     <br />
-    <a href="./issues/new">Report Bug</a>
+    <a href="https://github.com/RileyCodes/IndeedJobAnalyzer/issues/new">Report Bug</a>
     ·
-    <a href="./issues/new">Request Feature</a>
+    <a href="https://github.com/RileyCodes/IndeedJobAnalyzer/issues/new">Request Feature</a>
   </p>
 </p>
 
