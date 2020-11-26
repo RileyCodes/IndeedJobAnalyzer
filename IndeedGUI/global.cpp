@@ -6,13 +6,19 @@ Config config;
 TaskMgr taskMgr;
 RequestMgr requestMgr;
 
+IndeedGUI* pMainWindow = nullptr;
+
 EXTERN_DLL_EXPORT int StartGUI()
 {
 	int dummyArgc = 0;
 	QApplication app(dummyArgc, nullptr);
 	IndeedGUI mainWindow;
+	pMainWindow = &mainWindow;
 	mainWindow.show();
-	return app.exec();
+	auto exitCode = app.exec();
+
+	pMainWindow = nullptr;
+	return exitCode;
 }
 
 struct MsgInfo
@@ -35,4 +41,19 @@ EXTERN_DLL_EXPORT void* GetMsg()
 		return nullptr;
 
 	return msg;
+}
+
+EXTERN_DLL_EXPORT void AddLog(char* Msg)
+{
+	while (!pMainWindow)
+	{
+		//wait for main window initialized;
+		Sleep(1);
+		
+	}
+	QString qMsg = Msg;
+	pMainWindow->Addlog(qMsg);
+	
+	int x = 0;
+
 }

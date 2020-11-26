@@ -60,10 +60,8 @@ void DialogNewTask::TaskChanged()
 					if (taskName.length() == 0)
 						return;
 
-
 					AddNewTask(taskName);
 				}
-				
 			}
 		break;
 	case ExistedTask:

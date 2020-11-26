@@ -6,7 +6,22 @@ IndeedGUI::IndeedGUI(QWidget *parent)
 {
     ui.setupUi(this);	
     connect(ui.actionNewTaskButton, SIGNAL(triggered()), this, SLOT(NewTaskClicked()));
+
+    connect(this, SIGNAL(AddLogSignal(QString)), this, SLOT(_AddLog(QString)));
     SyncTasksToUI();
+}
+
+void IndeedGUI::_AddLog(QString message)
+{
+	auto fullMsg = QDateTime::currentDateTime().toString("[hh:mm:ss] ");
+    fullMsg += message + '\n';
+    ui.plainTextEditLog->appendPlainText(fullMsg);
+}
+
+void IndeedGUI::Addlog(QString message)
+{
+	//pass to main thread by signal
+    emit AddLogSignal(message);
 }
 
 void IndeedGUI::SyncTasksToUI()

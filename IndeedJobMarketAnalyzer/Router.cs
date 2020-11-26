@@ -33,26 +33,25 @@ namespace IndeedJobMarketAnalyzer
             }
         }
 
-        private void OnTest()
+        void OnTest()
         {
-            int count = Int32.Parse(JsonReq["count"].ToString());
-            string test = "count:" + count++;
-
-            IntPtr pMsg = Marshal.AllocHGlobal(Marshal.SizeOf(msg));
-            Marshal.StructureToPtr(msg, pMsg, false);
-            responseCb.Invoke(pMsg, test);
-            Marshal.FreeHGlobal(pMsg);
+            DoResponse("");
         }
 
         void OnMsgStartTask()
         {
             string test = "test";
 
+            DoResponse(test);
+        }
+
+        void DoResponse(string res)
+        {
             IntPtr pMsg = Marshal.AllocHGlobal(Marshal.SizeOf(msg));
             Marshal.StructureToPtr(msg, pMsg, false);
-            responseCb.Invoke(pMsg, test);
+            responseCb.Invoke(pMsg, res);
             Marshal.FreeHGlobal(pMsg);
-            int x = 0;
         }
     }
+
 }

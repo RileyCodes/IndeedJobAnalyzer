@@ -81,7 +81,7 @@ public:
 	void Enqueue(Msg msg);
 	Msg Dequeue();
 	void DoTest();
-	void DoRequest(QJsonObject& msgJsonObj);
+	QString DoRequest(QJsonObject& msgJsonObj);
 	QString GetReponseSync(int req);
 	void StartTask(QString taskName, QString url);
 

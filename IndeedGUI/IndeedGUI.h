@@ -13,10 +13,15 @@ class IndeedGUI : public QMainWindow
 /// </summary>
 public:
     IndeedGUI(QWidget *parent = Q_NULLPTR);
+    void Addlog(QString message);
     void SyncTasksToUI();
 
+signals:
+    void AddLogSignal(QString msg);
+
 public slots:
-    static void NewTaskClicked();
+    void _AddLog(QString message);
+    void NewTaskClicked();
     
 private:
     Ui::IndeedGUIClass ui;

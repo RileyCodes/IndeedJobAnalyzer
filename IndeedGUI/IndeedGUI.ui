@@ -145,9 +145,9 @@
           </widget>
          </item>
          <item>
-          <widget class="QPlainTextEdit" name="plainTextEdit">
+          <widget class="QPlainTextEdit" name="plainTextEditLog">
            <property name="plainText">
-            <string>(No Logs)</string>
+            <string/>
            </property>
           </widget>
          </item>

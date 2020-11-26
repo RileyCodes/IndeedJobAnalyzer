@@ -7,7 +7,6 @@ void RequestMgr::Enqueue(Msg msg)
 	msgQueue.enqueue(msg);
 }
 
-
 Msg RequestMgr::Dequeue()
 {
 	QMutexLocker mutexLocker(&qMutex_queue);
@@ -44,7 +43,7 @@ void RequestMgr::DoTest()
 	DoRequest(msgJson);
 }
 
-void RequestMgr::DoRequest(QJsonObject& msgJsonObj)
+QString RequestMgr::DoRequest(QJsonObject& msgJsonObj)
 {
 	QJsonDocument doc(msgJsonObj);
 	QString const msgJson(doc.toJson(QJsonDocument::Compact));
@@ -60,7 +59,7 @@ void RequestMgr::DoRequest(QJsonObject& msgJsonObj)
 	reqCount++;
 	qMutex_request.unlock();
 
-	GetReponseSync(currentReqCount);
+	return GetReponseSync(currentReqCount);
 }
 
 
@@ -94,23 +93,12 @@ void RequestMgr::AddCompletedRequest(int ReqNum,QString response)
 
 void RequestMgr::StartTask(QString taskName, QString url)
 {
-	while(1)
-	{
-		DoTest();
-	}
-	//QJsonObject msg_json;
-	//msg_json["type"] = MsgStartTask;
-	//msg_json["url"] = url;
-	//msg_json["taskName"] = taskName;
+	QJsonObject msgJson;
+	msgJson["type"] = MsgStartTask;
+	msgJson["taskName"] = taskName;
+	msgJson["url"] = url;
 
-	//QJsonDocument doc(msg_json);
-
-	//QString const msg_json_str(doc.toJson(QJsonDocument::Compact));
-
-	//Msg msg;
-	//msg.PutQStringAsUtf8(msg_json_str);	
-	//msg.cb = StartTaskResponse;
-	//Enqueue(msg);
+	auto response = DoRequest(msgJson);
 }
 
 

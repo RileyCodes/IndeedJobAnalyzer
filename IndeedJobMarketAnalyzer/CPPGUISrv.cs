@@ -14,12 +14,16 @@ namespace IndeedJobMarketAnalyzer
 
         [DllImport("IndeedGUI.dll")]
         public static extern IntPtr GetMsg();
-        
+
+        [DllImport("IndeedGUI.dll")]
+        public static extern void AddLog(string msg);
+
         private static bool isExited = false;
         private static int ExitCode = 0;
         
         static void Poll()
         {
+            LogMgr.Log("Software Started.");
             //Polls request made from IndeedGUI
             for (;;)
             {
