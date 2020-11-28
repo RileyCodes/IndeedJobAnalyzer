@@ -8,9 +8,22 @@ IndeedGUI::IndeedGUI(QWidget *parent)
     connect(ui.actionNewTaskButton, SIGNAL(triggered()), this, SLOT(NewTaskClicked()));
 
     connect(this, SIGNAL(AddLogSignal(QString)), this, SLOT(_AddLog(QString)));
+    connect(this, SIGNAL(UpdateTaskUiSignal(QString)), this, SLOT(_UpdateTaskUi(QString)));
+	
     SyncTasksToUI();
 }
 
+void IndeedGUI::_UpdateTaskUi(QString taskInfoJson)
+{
+	//should use model based ui and data binding instead
+    auto taskInfoJsonDoc = QJsonDocument::fromJson(taskInfoJson.toUtf8());
+    auto listTaskInfos = taskInfoJsonDoc.array();
+
+    for (auto list_task_info : listTaskInfos)
+    {
+        int x = 0;
+    }
+}
 void IndeedGUI::_AddLog(QString message)
 {
 	auto fullMsg = QDateTime::currentDateTime().toString("[hh:mm:ss] ");
@@ -22,6 +35,12 @@ void IndeedGUI::Addlog(QString message)
 {
 	//pass to main thread by signal
     emit AddLogSignal(message);
+}
+
+void IndeedGUI::UpdateTaskInfo(QString TaskInfoJson)
+{
+    //pass to main thread by signal
+	emit UpdateTaskUiSignal(TaskInfoJson);
 }
 
 void IndeedGUI::SyncTasksToUI()

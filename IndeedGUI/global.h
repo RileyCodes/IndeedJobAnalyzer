@@ -4,6 +4,7 @@ using namespace std;
 #include <Windows.h>
 #include <string>
 #include <qdir.h>
+#include <QTextStream>
 #include <qqueue.h>
 #include <QMutex>
 #include <QJsonObject>

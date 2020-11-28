@@ -12,7 +12,7 @@ EXTERN_DLL_EXPORT int StartGUI()
 {
 	int dummyArgc = 0;
 	QApplication app(dummyArgc, nullptr);
-	IndeedGUI mainWindow;
+	IndeedGUI mainWindow; 
 	pMainWindow = &mainWindow;
 	mainWindow.show();
 	auto exitCode = app.exec();
@@ -55,5 +55,13 @@ EXTERN_DLL_EXPORT void AddLog(char* Msg)
 	pMainWindow->Addlog(qMsg);
 	
 	int x = 0;
+}
 
+EXTERN_DLL_EXPORT void UpdateTaskInfo(char* TaskInfoJson)
+{
+	if (!pMainWindow)
+		return;
+
+	QString qjson = TaskInfoJson;
+	pMainWindow->UpdateTaskInfo(TaskInfoJson);
 }

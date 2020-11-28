@@ -40,9 +40,11 @@ namespace IndeedJobMarketAnalyzer
 
         void OnMsgStartTask()
         {
-            string test = "test";
+            string taskName = JsonReq["taskName"];
+            string url = JsonReq["url"];
 
-            DoResponse(test);
+            TaskMgr.NewTask(taskName,url);
+            //DoResponse(test);
         }
 
         void DoResponse(string res)
@@ -53,5 +55,4 @@ namespace IndeedJobMarketAnalyzer
             Marshal.FreeHGlobal(pMsg);
         }
     }
-
 }

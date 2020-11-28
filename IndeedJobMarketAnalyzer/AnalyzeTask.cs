@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -12,8 +13,18 @@ using PuppeteerSharp;
 
 namespace IndeedJobMarketAnalyzer
 {
-    class Analyzer
+    class AnalyzeTask
     {
+        public enum Status
+        {
+            INIT,
+            RUNNING,
+            COMPLETED,
+            FAILED
+        }
+
+        public Status status = Status.INIT;
+
         private Config config;
         private Browser browser = null;
         //private Dictionary<string,List<JobData>> JobdataByKeyword = new Dictionary<string, List<JobData>>();
@@ -26,7 +37,7 @@ namespace IndeedJobMarketAnalyzer
         private bool _needStop = false;
         private bool _stopped = true;
         
-        public Analyzer(Config config)
+        public AnalyzeTask(Config config)
         {
             this.config = config;
 
@@ -37,7 +48,7 @@ namespace IndeedJobMarketAnalyzer
         }
         public enum JobStatus
         {
-            Initialized,
+            Pending,
             Failed,
             Complete
         }
@@ -47,7 +58,7 @@ namespace IndeedJobMarketAnalyzer
             public string JobTitle;
             public string JobCompany;
             public string id;
-            public JobStatus JobStatus = JobStatus.Initialized;
+            public JobStatus JobStatus = JobStatus.Pending;
             public string JobDesc;
             public string JobUrl;
 
@@ -63,7 +74,25 @@ namespace IndeedJobMarketAnalyzer
             _needStop = true;
             while(!_stopped)
                 Thread.Sleep(5);
+        }
 
+        public struct TaskInfo
+        {
+            public string TaskName;
+            public int JobDownloadedCount;
+            public int Status;
+        }
+        
+        public TaskInfo GetTaskInfo()
+        {
+            TaskInfo taskInfo = new TaskInfo()
+            {
+                TaskName = config.TaskFileName, 
+                JobDownloadedCount = JobdataByTitleAndCompany.Count,
+                Status = (int)status
+            };
+
+            return taskInfo;
         }
 
         async Task<List<JobData>> GetJobDatas(Page page)
@@ -79,7 +108,7 @@ namespace IndeedJobMarketAnalyzer
                 doc.LoadHtml(html);
                 
                 var jobData = new JobData();
-
+                
                 var JobTitle =
                     doc.DocumentNode.SelectNodes("//a[contains(@class, 'jobtitle')]").FirstOrDefault();
 
@@ -88,12 +117,8 @@ namespace IndeedJobMarketAnalyzer
                     LogMgr.Log("Failed to find JobTitle:" + html);
                     continue;
                 }
-
-                jobData.id = JobTitle.Id;
-
                 
-
-
+                jobData.id = JobTitle.Id;
 
                 var titleAttribute = JobTitle.Attributes.FirstOrDefault(attr => attr.Name == "title");
                 if (titleAttribute == null)
@@ -113,9 +138,7 @@ namespace IndeedJobMarketAnalyzer
                     continue;
                 }
 
-
                 jobData.JobCompany = JobCompany.InnerText;
-
 
                 if (JobdataByTitleAndCompany.ContainsKey(jobData.UniqueIdentifier))
                 {
@@ -138,25 +161,7 @@ namespace IndeedJobMarketAnalyzer
         
         public async Task<bool> Run()
         {
-            try
-            {
-                if (!string.IsNullOrEmpty(config.TaskFileName))
-                {
-                    var jobDataInJSON = System.IO.File.ReadAllText(Config.TaskDir + config.TaskFileName);
-                    JobDatas = JsonConvert.DeserializeObject<List<JobData>>(jobDataInJSON);
-                    LoadFromJobDatas();
-                }
-                else
-                {
-                    config.TaskFileName = Util.ShortUUID() + ".txt";
-                }
-            }
-            catch (Exception e)
-            {
-                LogMgr.Log("Error: failed while load or create task data: " + e.Message + " at:" + e.StackTrace);
-                return false;
-            }
-
+            if (!TryLoadTaskData()) return false;
 
             _stopped = false;
             //await new BrowserFetcher().DownloadAsync(BrowserFetcher.DefaultRevision);
@@ -204,7 +209,7 @@ namespace IndeedJobMarketAnalyzer
                 }
                 catch (UserStoppedException userStoppedException)
                 {
-                    LogMgr.Log("Analyzer stopped by user.");
+                    LogMgr.Log("AnalyzeTask stopped by user.");
                     _needStop = false;
                     _stopped = true;
                     Save();
@@ -226,7 +231,36 @@ namespace IndeedJobMarketAnalyzer
             LogMgr.Log("error: unexpected execution path");
             return false;
         }
-        
+
+        private bool TryLoadTaskData()
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(config.TaskFileName))
+                {
+                    var taskFilePath = Config.TaskDir + config.TaskFileName + ".txt";
+
+                    if (File.Exists(taskFilePath))
+                    {
+                        var jobDataInJSON = System.IO.File.ReadAllText(taskFilePath);
+                        JobDatas = JsonConvert.DeserializeObject<List<JobData>>(jobDataInJSON);
+                        LoadFromJobDatas();
+                    }
+                }
+                else
+                {
+                    config.TaskFileName = Util.ShortUUID() + ".txt";
+                }
+            }
+            catch (Exception e)
+            {
+                LogMgr.Log("Error: failed while load or create task data: " + e.Message + " at:" + e.StackTrace);
+                return false;
+            }
+
+            return true;
+        }
+
         private void Save()
         {
             var jsonData = JsonConvert.SerializeObject(JobDatas);
@@ -306,7 +340,7 @@ namespace IndeedJobMarketAnalyzer
                 }
 
                 await EnsureAllPageClosedByUrl("viewjob");
-                Thread.Sleep(1000); //slow down to prevent being flagged as a bot
+                Thread.Sleep(3000); //slow down to prevent being flagged as a bot
             }
         }
 

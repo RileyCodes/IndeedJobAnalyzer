@@ -14,7 +14,7 @@ namespace IndeedJobMarketAnalyzer
 #else
             const string JavaScriptPathPrefix = "";
 #endif
-            
+
             try
             {
                 var script = await System.IO.File.ReadAllTextAsync(JavaScriptPathPrefix + "./JavaScript/" + JSName + ".js");

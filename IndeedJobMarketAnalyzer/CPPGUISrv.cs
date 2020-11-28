@@ -18,12 +18,14 @@ namespace IndeedJobMarketAnalyzer
         [DllImport("IndeedGUI.dll")]
         public static extern void AddLog(string msg);
 
+        [DllImport("IndeedGUI.dll")]
+        public static extern void UpdateTaskInfo(string msg);
+
         private static bool isExited = false;
         private static int ExitCode = 0;
         
         static void Poll()
         {
-            LogMgr.Log("Software Started.");
             //Polls request made from IndeedGUI
             for (;;)
             {
@@ -48,7 +50,7 @@ namespace IndeedJobMarketAnalyzer
                 var responseCb = Marshal.GetDelegateForFunctionPointer<ResponseCB>(msg.cb);
 
                 new Router(reqJsonStr, responseCb, msg);
-
+                
             }
         }
 
@@ -66,8 +68,10 @@ namespace IndeedJobMarketAnalyzer
 
         public static int Start()
         {
-            Thread cppMainThread = new Thread(CPPGUISrv._Main);
+            Thread cppMainThread = new Thread(_Main);
             cppMainThread.Start();
+
+            LogMgr.Log("Software Started.");
             Poll();
 
             return ExitCode;

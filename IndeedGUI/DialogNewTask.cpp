@@ -9,12 +9,10 @@ DialogNewTask::DialogNewTask(QWidget *parent)
 
 	connect(ui.pushButton_close, SIGNAL(clicked()), this, SLOT(CloseClicked()));
 	connect(ui.comboBox_taskname, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(TaskChanged()));
-
 	connect(ui.pushButton_start, SIGNAL(clicked()), this, SLOT(StartClicked()));
 	
 	SyncCurrentTasks();
 }
-
 
 void DialogNewTask::SyncCurrentTasks()
 {
