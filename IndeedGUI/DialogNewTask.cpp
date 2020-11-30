@@ -1,97 +1,65 @@
 #include "global.h"
 #include "DialogNewTask.h"
 
-DialogNewTask::DialogNewTask(QWidget *parent)
+DialogNewTask::DialogNewTask(QWidget* parent)
 	: QDialog(parent)
 {
 	setWindowFlags(Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
 	ui.setupUi(this);
 
 	connect(ui.pushButton_close, SIGNAL(clicked()), this, SLOT(CloseClicked()));
-	connect(ui.comboBox_taskname, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(TaskChanged()));
 	connect(ui.pushButton_start, SIGNAL(clicked()), this, SLOT(StartClicked()));
-	
-	SyncCurrentTasks();
 }
 
-void DialogNewTask::SyncCurrentTasks()
-{
-	auto taskNames = taskMgr.GetTaskNames();
-	ui.comboBox_taskname->clear();
-
-	ui.comboBox_taskname->addItem("(Select)", Select);
-	for (auto task_name : taskNames)
-	{
-		task_name = task_name.replace(".txt", "");
-		ui.comboBox_taskname->addItem(task_name,ExistedTask);
-	}
-	ui.comboBox_taskname->addItem("Add a new  task", NewTask);
-}
 
 DialogNewTask::~DialogNewTask()
 {
 }
 
-void DialogNewTask::AddNewTask(QString taskName)
-{
-	ui.comboBox_taskname->insertItem(1, taskName);
-	ui.comboBox_taskname->setCurrentIndex(1);
-}
-
-void DialogNewTask::TaskChanged()
-{
-	taskComboType = static_cast<TaskComboType>(ui.comboBox_taskname->currentData().toInt());
-
-	switch(taskComboType)
-	{
-	case Select:
-		break;
-		case NewTask:
-			{
-			
-				ui.comboBox_taskname->setCurrentIndex(0);
-				QInputDialog inputNewTaskName;
-				inputNewTaskName.setLabelText("Enter a task name: ");
-				if(inputNewTaskName.exec())
-				{	
-					auto taskName = inputNewTaskName.textValue();
-					if (taskName.length() == 0)
-						return;
-
-					AddNewTask(taskName);
-				}
-			}
-		break;
-	case ExistedTask:
-		break;
-	}
-
-	return;
-}
-
 void DialogNewTask::StartClicked()
 {
 	auto url = ui.lineEdit_url->text();
-	if(url.length() == 0)
+	if (url.length() == 0)
 	{
-		QMessageBox::critical(nullptr, "Error", 
-		                      "url is required");
+		QMessageBox::critical(nullptr, "Error",
+			"url is required");
 		return;
 	}
+
+	if (!url.contains("http") ||
+		!url.contains("indeed") ||
+		!url.contains("jobs") ||
+		!url.contains("?q="))
+	{
+		QMessageBox::critical(nullptr, "Error",
+			"incorrect url");
+		return;
+	}
+
+	QUrl qUrl(url);
+	QUrlQuery query(qUrl.query());
+
+	auto queryValue = query.queryItemValue("q");
+	if(queryValue.count() == 0)
+	{
+		QMessageBox::critical(nullptr, "Error",
+			"incorrect query, please check url is correct");
+		return;
+	}
+	url = "https://www.indeed.com/jobs?q=" + queryValue;
 	
-	auto currentIndex = ui.comboBox_taskname->currentIndex();
+	
 
-	if(currentIndex == 0 || currentIndex == ui.comboBox_taskname->count() - 1)
-	{
-		//if index is first or last, it means no tasks had been selected
-		QMessageBox::critical(NULL, "Error",
-			"must select a task");
-		return;
-	}
-
-	auto taskName = ui.comboBox_taskname->currentText();
-
+	auto taskName = ui.lineEdit_newtaskname->text();
+	
+	QProgressDialog progressBarDialog("Starting in progress.", "", 0, 0);
+	progressBarDialog.setCancelButton(0);
+	progressBarDialog.setWindowModality(Qt::WindowModal);
+	progressBarDialog.setModal(true);
+	progressBarDialog.show();
 	requestMgr.StartTask(taskName, url);
+	progressBarDialog.close();
+
 }
 
 void DialogNewTask::CloseClicked()

@@ -47,7 +47,7 @@ namespace IndeedJobMarketAnalyzer
                 }
 
                 var taskInfoJson = JsonConvert.SerializeObject(taskInfos);
-                CPPGUISrv.UpdateTaskInfo(taskInfoJson);
+                IGUIWrapper.UpdateTaskInfo(taskInfoJson);
             }
         }
 

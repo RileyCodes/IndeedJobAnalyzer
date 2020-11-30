@@ -3,17 +3,20 @@
 using namespace std;
 #include <Windows.h>
 #include <string>
-#include <qdir.h>
+#include <QDir>
+#include <QStandardItemModel>
+#include <QProgressDialog>
+#include <QUrlQuery>
 #include <QTextStream>
-#include <qqueue.h>
+#include <QQueue>
 #include <QMutex>
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QDateTime>
-#include <qmessagebox.h>
-#include <qinputdialog.h>
-#include <qset.h>
+#include <QMessageBox>
+#include <QInputDialog>
+#include <QSet>
 #include "RequestMgr.h"
 #include "Config.h"
 extern Config config;

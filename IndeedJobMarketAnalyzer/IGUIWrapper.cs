@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 
 namespace IndeedJobMarketAnalyzer
 {
-    partial class CPPGUISrv
+    partial class IGUIWrapper
     {
         [DllImport("IndeedGUI.dll")]
         public static extern int StartGUI();

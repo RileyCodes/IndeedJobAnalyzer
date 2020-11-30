@@ -38,8 +38,7 @@ void RequestMgr::DoTest()
 	QJsonObject msgJson;
 	msgJson["type"] = MsgTest;
 	msgJson["count"] = "0";
-
-
+	
 	DoRequest(msgJson);
 }
 
@@ -63,14 +62,14 @@ QString RequestMgr::DoRequest(QJsonObject& msgJsonObj)
 }
 
 
-QString RequestMgr::GetReponseSync(int req)
+QString RequestMgr::GetReponseSync(int req)		
 {
 	while(completedRequests.count(req) == 0)
 	{
 		Sleep(1);
 		QApplication::processEvents();
 	}
-
+	
 	//There is no guarantee GetReponseSync and AddCompletedRequest will never executed
 	//in same time or run in same thread.
 	//especially in event this class is ported to another project in future.

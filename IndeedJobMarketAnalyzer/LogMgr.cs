@@ -8,7 +8,7 @@ namespace IndeedJobMarketAnalyzer
     {
         public static void Log(string Message)
         {
-            CPPGUISrv.AddLog(Message);
+            IGUIWrapper.AddLog(Message);
         }
     }
 }

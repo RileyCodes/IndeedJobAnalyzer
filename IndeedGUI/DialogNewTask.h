@@ -17,7 +17,6 @@ class DialogNewTask : public  QDialog
 
 public:
 	DialogNewTask(QWidget *parent = Q_NULLPTR);
-	void SyncCurrentTasks();
 	~DialogNewTask();
 	void AddNewTask(QString taskName);
 
@@ -28,6 +27,6 @@ private:
 
 private slots:
 	void CloseClicked();
-	void TaskChanged();
+	//void TaskChanged();
 	void StartClicked();
 };

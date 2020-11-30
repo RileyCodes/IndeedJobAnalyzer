@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
 using Newtonsoft.Json;
-using Msg = IndeedJobMarketAnalyzer.CPPGUISrv.Msg;
-using MsgType = IndeedJobMarketAnalyzer.CPPGUISrv.MsgType;
+using Msg = IndeedJobMarketAnalyzer.IGUIWrapper.Msg;
+using MsgType = IndeedJobMarketAnalyzer.IGUIWrapper.MsgType;
 
 namespace IndeedJobMarketAnalyzer
 {
@@ -44,7 +44,7 @@ namespace IndeedJobMarketAnalyzer
             string url = JsonReq["url"];
 
             TaskMgr.NewTask(taskName,url);
-            //DoResponse(test);
+            DoResponse("");
         }
 
         void DoResponse(string res)

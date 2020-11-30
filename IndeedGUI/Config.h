@@ -8,7 +8,7 @@ public:
 
 	Config()
 	{
-		TaskFolderName = "./Tasks";
+		TaskFolderName = "./Tasks/";
 		SoftwareName = "IndeedJobAnalyser";
 	}
 };

@@ -36,10 +36,13 @@ namespace IndeedJobMarketAnalyzer
         private int _pageCount = 0;
         private bool _needStop = false;
         private bool _stopped = true;
-        
+        private string currentUrl = "";
+
+
         public AnalyzeTask(Config config)
         {
             this.config = config;
+            this.currentUrl = config.SearchStartUrl;
 
             //foreach (var keyword in config.TechKeyword)
             //{
@@ -75,12 +78,13 @@ namespace IndeedJobMarketAnalyzer
             while(!_stopped)
                 Thread.Sleep(5);
         }
-
+        
         public struct TaskInfo
         {
             public string TaskName;
             public int JobDownloadedCount;
             public int Status;
+            public int PageAt;
         }
         
         public TaskInfo GetTaskInfo()
@@ -89,7 +93,8 @@ namespace IndeedJobMarketAnalyzer
             {
                 TaskName = config.TaskFileName, 
                 JobDownloadedCount = JobdataByTitleAndCompany.Count,
-                Status = (int)status
+                Status = (int)status,
+                PageAt = _pageCount
             };
 
             return taskInfo;
@@ -137,7 +142,7 @@ namespace IndeedJobMarketAnalyzer
                     LogMgr.Log("Failed to find CompanyName:" + html);
                     continue;
                 }
-
+                
                 jobData.JobCompany = JobCompany.InnerText;
 
                 if (JobdataByTitleAndCompany.ContainsKey(jobData.UniqueIdentifier))
@@ -166,7 +171,7 @@ namespace IndeedJobMarketAnalyzer
             _stopped = false;
             //await new BrowserFetcher().DownloadAsync(BrowserFetcher.DefaultRevision);
 
-            var currentUrl = config.SearchStartUrl;
+            currentUrl = config.SearchStartUrl;
             for (;;)
             {
                 try
@@ -174,7 +179,8 @@ namespace IndeedJobMarketAnalyzer
                     browser = await Puppeteer.LaunchAsync(new LaunchOptions
                     {
                         Headless = false,
-                        DefaultViewport = null
+                        DefaultViewport = new ViewPortOptions() {Height = 500, Width = 500},
+                        Args = new[] { "--window-size=500,500" }
                     });
 
                     var page = await browser.NewPageAsync();
@@ -187,13 +193,9 @@ namespace IndeedJobMarketAnalyzer
                             throw new UserStoppedException();
                         }
 
-
                         var jobDatas = await GetJobDatas(page);
-
                         await ProcessAllJobDatasInCurrentPage(jobDatas, page);
-
                         var nextPageResult = (await JSExecuter.JSExec(page, "TryGotoNextPage")).ToString();
-
 
                         if (!await TryGotoNextPage(nextPageResult, page))
                         {
@@ -238,18 +240,20 @@ namespace IndeedJobMarketAnalyzer
             {
                 if (!string.IsNullOrEmpty(config.TaskFileName))
                 {
-                    var taskFilePath = Config.TaskDir + config.TaskFileName + ".txt";
+                    var taskFilePath = Config.TaskDir + config.TaskFileName;
 
                     if (File.Exists(taskFilePath))
                     {
                         var jobDataInJSON = System.IO.File.ReadAllText(taskFilePath);
-                        JobDatas = JsonConvert.DeserializeObject<List<JobData>>(jobDataInJSON);
+
+                        SavedTask savedTask = JsonConvert.DeserializeObject<SavedTask>(jobDataInJSON);
+                        JobDatas = savedTask.JobDatas;
                         LoadFromJobDatas();
                     }
                 }
                 else
                 {
-                    config.TaskFileName = Util.ShortUUID() + ".txt";
+                    config.TaskFileName = Util.ShortUUID();
                 }
             }
             catch (Exception e)
@@ -261,9 +265,25 @@ namespace IndeedJobMarketAnalyzer
             return true;
         }
 
+        struct SavedTask
+        {
+            public string TaskName;
+            public int JobCount;
+            public int PagesAt;
+            public string Url;
+            public List<JobData> JobDatas;
+        }
+
         private void Save()
         {
-            var jsonData = JsonConvert.SerializeObject(JobDatas);
+            SavedTask savedTask = new SavedTask();
+            savedTask.TaskName = config.TaskFileName;
+            savedTask.PagesAt = _pageCount;
+            savedTask.JobCount = JobDatas.Count;
+            savedTask.Url = currentUrl;
+            savedTask.JobDatas = JobDatas;
+
+            var jsonData = JsonConvert.SerializeObject(savedTask);
             var filePath = Config.TaskDir + config.TaskFileName;
             
             System.IO.FileInfo file = new System.IO.FileInfo(filePath);
@@ -307,6 +327,7 @@ namespace IndeedJobMarketAnalyzer
             for(var i=0; i  < jobDatas.Count; i++)
             {
                 var jobData = jobDatas[i];
+                LogMgr.Log("Processing: " + jobData.JobTitle);
 
                 await JSExecuter.JSExec(page, "ClickOnJob",
                     (JSCode => JSCode.Replace("[elementId]", jobData.id)));

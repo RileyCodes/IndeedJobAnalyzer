@@ -6,7 +6,7 @@ using System.Text;
 namespace IndeedJobMarketAnalyzer
 {
     //WARNING: Must match with IndeedGUI
-    partial class CPPGUISrv
+    partial class IGUIWrapper
     {
         public enum MsgType
         {
