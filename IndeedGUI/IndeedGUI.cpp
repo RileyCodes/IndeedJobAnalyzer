@@ -59,15 +59,15 @@ void IndeedGUI::customMenuRequested(QPoint pos)
 	
     QMenu menu(this);
 
-    auto action_continueTask = new QAction("Continue Task", this);
+	auto* action_continueTask = new QAction("Continue Task", this);
     connect(action_continueTask, SIGNAL(triggered(bool)), this, SLOT(continueTask(bool)));
     menu.addAction(action_continueTask);
 
-    auto action_RestartTask = new QAction("Restart Task", this);
+	auto* action_RestartTask = new QAction("Restart Task", this);
     connect(action_RestartTask, SIGNAL(triggered(bool)), this, SLOT(restartTask(bool)));
     menu.addAction(action_RestartTask);
 
-    auto action_GenerateReport = new QAction("Generate Report", this);
+	auto* action_GenerateReport = new QAction("Generate Report", this);
     connect(action_GenerateReport, SIGNAL(triggered(bool)), this, SLOT(generateTask(bool)));
     menu.addAction(action_GenerateReport);
 	
@@ -75,7 +75,7 @@ void IndeedGUI::customMenuRequested(QPoint pos)
 }
 
 
-void IndeedGUI::Addlog(QString message)
+void IndeedGUI::AddLog(QString message)
 {
 	//pass to main thread by signal
     emit AddLogSignal(message);
