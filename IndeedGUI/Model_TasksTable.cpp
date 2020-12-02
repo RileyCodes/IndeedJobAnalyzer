@@ -11,8 +11,7 @@ void Model_TasksTable::populateData(const QList<TaskRowData>& tasksData)
 {
 	tasksTableData.append(tasksData);
 	emit dataChanged(index(0, 0), index(10, 10));
-	
-
+	emit layoutChanged();
 }
 
 
@@ -54,13 +53,13 @@ QVariant Model_TasksTable::data(const QModelIndex& index, int role) const
 	switch (index.column())
 	{
 	case tableTasks_TaskName:
-		return tasksTableData[index.row()].taskName;
+		return tasksTableData[index.row()].TaskName;
 	case tableTasks_PagesAt:
-		return tasksTableData[index.row()].pagesAt;
+		return tasksTableData[index.row()].PagesAt;
 	case tableTasks_JobCount:
-		return tasksTableData[index.row()].jobCount;
+		return tasksTableData[index.row()].JobCount;
 	case tableTasks_Status:
-		return tasksTableData[index.row()].status;
+		return tasksTableData[index.row()].Status;
 	}
 
 	return QVariant();

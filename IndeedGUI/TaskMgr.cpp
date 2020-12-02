@@ -3,12 +3,12 @@
 
 bool TaskMgr::EnsureTaskFolderCreated()
 {
-	if (QDir(config.TaskFolderName).exists())
+	if (QDir(pConfig->TaskFolderName).exists())
 	{
 		return true;
 	}
 
-	return QDir().mkdir(config.TaskFolderName);
+	return QDir().mkdir(pConfig->TaskFolderName);
 }
 
 

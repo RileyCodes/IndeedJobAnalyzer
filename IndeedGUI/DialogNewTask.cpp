@@ -57,7 +57,7 @@ void DialogNewTask::StartClicked()
 	progressBarDialog.setWindowModality(Qt::WindowModal);
 	progressBarDialog.setModal(true);
 	progressBarDialog.show();
-	requestMgr.StartTask(taskName, url);
+	pRequestMgr->StartTask(taskName, url);
 	progressBarDialog.close();
 
 }

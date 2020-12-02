@@ -99,10 +99,12 @@
   <ItemGroup>
     <ClCompile Include="Config.cpp" />
     <ClCompile Include="DialogNewTask.cpp" />
+    <ClCompile Include="ExportFunctions.cpp" />
     <ClCompile Include="global.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Model_TasksTable.cpp" />
+    <ClCompile Include="PendingLogMgr.cpp" />
     <ClCompile Include="RequestMgr.cpp" />
     <ClCompile Include="TaskMgr.cpp" />
     <ClCompile Include="Util.cpp" />
@@ -123,8 +125,10 @@
   <ItemGroup>
     <QtMoc Include="DialogNewTask.h" />
     <ClInclude Include="Config.h" />
+    <ClInclude Include="ExportFunctions.h" />
     <ClInclude Include="global.h" />
     <QtMoc Include="Model_TasksTable.h" />
+    <ClInclude Include="PendingLogMgr.h" />
     <ClInclude Include="RequestMgr.h" />
     <ClInclude Include="TaskMgr.h" />
     <ClInclude Include="Util.h" />

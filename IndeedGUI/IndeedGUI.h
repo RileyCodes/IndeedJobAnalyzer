@@ -48,9 +48,10 @@ public:
 	
     //QMap<string
 	
+    void AddLogWithMeta(QString message);
     void AddLog(QString message);
+    void AddPendingLog();
     void UpdateTaskInfo(QString message);
-    void SyncTasksToUI();
 
 signals:
     void AddLogSignal(QString msg);

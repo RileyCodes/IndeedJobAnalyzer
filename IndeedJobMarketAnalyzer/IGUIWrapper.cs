@@ -10,7 +10,7 @@ namespace IndeedJobMarketAnalyzer
     partial class IGUIWrapper
     {
         [DllImport("IndeedGUI.dll")]
-        public static extern int StartGUI();
+        public static extern int StartQT();
 
         [DllImport("IndeedGUI.dll")]
         public static extern IntPtr GetMsg();
@@ -56,7 +56,7 @@ namespace IndeedJobMarketAnalyzer
 
         static void _Main()
         {
-            var exitCode = StartGUI();
+            var exitCode = StartQT();
             AfterMain(exitCode);
         }
 

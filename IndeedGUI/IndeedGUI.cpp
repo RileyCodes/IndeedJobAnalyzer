@@ -11,8 +11,8 @@ IndeedGUI::IndeedGUI(QWidget *parent)
 
     connect(ui.tableView_tasks, SIGNAL(customContextMenuRequested(QPoint)),
         SLOT(customMenuRequested(QPoint)));
-	
-    SyncTasksToUI();
+
+    pTaskMgr->BindModelToTable(ui.tableView_tasks);
 }
 
 void IndeedGUI::_UpdateTaskUi(QString taskInfoJson)
@@ -29,9 +29,7 @@ void IndeedGUI::_UpdateTaskUi(QString taskInfoJson)
 
 void IndeedGUI::_AddLog(QString message)
 {
-	auto fullMsg = QDateTime::currentDateTime().toString("[hh:mm:ss] ");
-    fullMsg += message + '\n';
-    ui.plainTextEditLog->appendPlainText(fullMsg);
+    ui.plainTextEditLog->appendPlainText(message);
 }
 
 void IndeedGUI::continueTask()
@@ -76,10 +74,29 @@ void IndeedGUI::customMenuRequested(QPoint pos)
 }
 
 
+void IndeedGUI::AddLogWithMeta(QString message)
+{
+    auto fullMsg = QDateTime::currentDateTime().toString("[hh:mm:ss] ");
+    fullMsg += message;
+	
+    AddLog(fullMsg);
+}
+
 void IndeedGUI::AddLog(QString message)
 {
-	//pass to main thread by signal
+    //pass to main thread by signal
     emit AddLogSignal(message);
+}
+
+void IndeedGUI::AddPendingLog()
+{
+    auto pendingLogsStd = pendingLogMgr.GetAllPendingLogs();
+    pendingLogsStd += "---END OF LOGS BEFORE START---\n";
+	
+    QString pendingLogs;
+    pendingLogs = QString::fromStdString(pendingLogsStd);
+	
+    AddLog(pendingLogs);
 }
 
 void IndeedGUI::UpdateTaskInfo(QString TaskInfoJson)
@@ -90,39 +107,7 @@ void IndeedGUI::UpdateTaskInfo(QString TaskInfoJson)
 
 
 
-void IndeedGUI::SyncTasksToUI()
-{
-    ui.tableView_tasks->horizontalHeader()->setVisible(true);
 
-    auto taskInfos = taskMgr.GetTasksInfo();
-    auto* modelTasksTable = new Model_TasksTable();
-
-    QList<TaskRowData> tasksTableData;
-    {
-        TaskRowData test;
-        test.status = "1";
-        test.jobCount = "2";
-        test.pagesAt = "3";
-        test.taskName = "4";
-        tasksTableData.push_back(test);
-    }
-    modelTasksTable->populateData(tasksTableData);
-    ui.tableView_tasks->setModel(modelTasksTable);
-
-    ui.tableView_tasks->show();
-	
-    {
-        TaskRowData test;
-        test.status = "1";
-        test.jobCount = "2";
-        test.pagesAt = "3";
-        test.taskName = "4";
-        tasksTableData.push_back(test);
-    }
-    modelTasksTable->populateData(tasksTableData);
-    ui.tableView_tasks->setModel(modelTasksTable);
-
-}
 
 void IndeedGUI::NewTaskClicked()
 {

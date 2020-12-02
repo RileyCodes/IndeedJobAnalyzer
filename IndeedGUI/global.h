@@ -2,6 +2,7 @@
 
 #define EXTERN_DLL_EXPORT extern "C" __declspec(dllexport)
 
+
 using namespace std;
 #include <Windows.h>
 #include <string>
@@ -19,20 +20,33 @@ using namespace std;
 #include <QMessageBox>
 #include <QInputDialog>
 #include <QSet>
+
+//---END OF EXTERNAL HEAD FILE---
+
+
+#define ptr int32_t//this way we can change to x64 whenever we need
+#include "Config.h"
+extern Config* pConfig;
 #include "Model_TasksTable.h"
 #include "RequestMgr.h"
-#include "Config.h"
-
-EXTERN_DLL_EXPORT void AddLog(char* Msg);
-
-extern Config config;
-extern RequestMgr requestMgr;
-extern QQueue 
-
-#include "Util.h"
+#include "PendingLogMgr.h"
+#include "IndeedGUI.h"
 
 
 
 #include "TaskMgr.h"
-extern TaskMgr taskMgr;
+extern RequestMgr* pRequestMgr;
+extern PendingLogMgr pendingLogMgr;
+extern IndeedGUI* pMainWindow;
+extern TaskMgr* pTaskMgr;
+
+
+EXTERN_DLL_EXPORT void AddLog(char* Log);
+
+
+
+
+
+
+#include "Util.h"
 #include "DialogNewTask.h"
