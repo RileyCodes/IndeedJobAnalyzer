@@ -102,6 +102,7 @@
     <ClCompile Include="global.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Model_TasksTable.cpp" />
     <ClCompile Include="RequestMgr.cpp" />
     <ClCompile Include="TaskMgr.cpp" />
     <ClCompile Include="Util.cpp" />
@@ -112,6 +113,10 @@
     <ClCompile Include="IndeedGUI.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">global.h</PrecompiledHeaderFile>
+      <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">input</DynamicSource>
+      <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).moc</QtMocFileName>
+      <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">input</DynamicSource>
+      <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).moc</QtMocFileName>
     </ClCompile>
     <ClCompile Include="main.cpp" />
   </ItemGroup>
@@ -119,6 +124,7 @@
     <QtMoc Include="DialogNewTask.h" />
     <ClInclude Include="Config.h" />
     <ClInclude Include="global.h" />
+    <QtMoc Include="Model_TasksTable.h" />
     <ClInclude Include="RequestMgr.h" />
     <ClInclude Include="TaskMgr.h" />
     <ClInclude Include="Util.h" />

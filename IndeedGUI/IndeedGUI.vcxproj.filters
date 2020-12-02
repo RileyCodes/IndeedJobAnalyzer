@@ -33,9 +33,6 @@
     <QtMoc Include="IndeedGUI.h">
       <Filter>Header Files</Filter>
     </QtMoc>
-    <ClCompile Include="IndeedGUI.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -59,6 +56,12 @@
     <ClCompile Include="RequestMgr.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Model_TasksTable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IndeedGUI.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Util.h">
@@ -79,6 +82,9 @@
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="DialogNewTask.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="Model_TasksTable.h">
       <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>

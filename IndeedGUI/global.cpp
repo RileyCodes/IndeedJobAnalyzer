@@ -52,7 +52,7 @@ EXTERN_DLL_EXPORT void AddLog(char* Msg)
 		
 	}
 	QString qMsg = Msg;
-	pMainWindow->Addlog(qMsg);
+	pMainWindow->AddLog(qMsg);
 	
 	int x = 0;
 }

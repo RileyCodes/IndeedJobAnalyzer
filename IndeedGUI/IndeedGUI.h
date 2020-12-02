@@ -14,47 +14,41 @@ class IndeedGUI : public QMainWindow
 public:
     IndeedGUI(QWidget *parent = Q_NULLPTR);
 
-	struct TaskTables
-	{
-        QTableWidgetItem* taskName = nullptr;
-        QTableWidgetItem* pagesAt = nullptr;
-        QTableWidgetItem* jobCount = nullptr;
-        QTableWidgetItem* status = nullptr;
-	};
-	class TasksTableMgr
-	{
-        QMap<string, TaskTables> tasksTable;
-        QTableWidget* tableWidget = nullptr;
 
-        enum
-        {
-            tableTasks_TaskName,
-            tableTasks_PagesAt,
-            tableTasks_JobCount,
-            tableTasks_Status
-        };
-	public:
-		void InsertRow(QString taskName,int pageAt,int jobCount,QString status)
-		{
-            TaskTables taskTables;
-            taskTables.taskName = new QTableWidgetItem(taskName);
-            taskTables.pagesAt= new QTableWidgetItem(QString::number(pageAt));
-            taskTables.jobCount = new QTableWidgetItem(QString::number(jobCount));
-            taskTables.status = new QTableWidgetItem(status);
-			
-            tableWidget->insertRow(0);
-            tableWidget->setItem(0, tableTasks_TaskName, taskTables.taskName);
-            tableWidget->setItem(0, tableTasks_PagesAt, taskTables.taskName);
-            tableWidget->setItem(0, tableTasks_JobCount, taskTables.taskName);
-            tableWidget->setItem(0, tableTasks_Status, taskTables.taskName);
-		}
-	};
+	//class TasksTableMgr
+	//{
+ //       QMap<string, TaskTables> tasksTable;
+ //       QTableWidget* tableWidget = nullptr;
+
+ //       enum
+ //       {
+ //           tableTasks_TaskName,
+ //           tableTasks_PagesAt,
+ //           tableTasks_JobCount,
+ //           tableTasks_Status
+ //       };
+	//public:
+	//	void InsertRow(QString taskName,int pageAt,int jobCount,QString status)
+	//	{
+ //           TaskTables taskTables;
+ //           taskTables.taskName = new QTableWidgetItem(taskName);
+ //           taskTables.pagesAt= new QTableWidgetItem(QString::number(pageAt));
+ //           taskTables.jobCount = new QTableWidgetItem(QString::number(jobCount));
+ //           taskTables.status = new QTableWidgetItem(status);
+	//		
+ //           tableWidget->insertRow(0);
+ //           tableWidget->setItem(0, tableTasks_TaskName, taskTables.taskName);
+ //           tableWidget->setItem(0, tableTasks_PagesAt, taskTables.taskName);
+ //           tableWidget->setItem(0, tableTasks_JobCount, taskTables.taskName);
+ //           tableWidget->setItem(0, tableTasks_Status, taskTables.taskName);
+	//	}
+	//};
 
     
 	
     //QMap<string
 	
-    void Addlog(QString message);
+    void AddLog(QString message);
     void UpdateTaskInfo(QString message);
     void SyncTasksToUI();
 

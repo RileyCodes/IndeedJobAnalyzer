@@ -93,42 +93,6 @@
           <widget class="QTableView" name="tableView_tasks"/>
          </item>
          <item>
-          <widget class="QTableWidget" name="tableWidget_tasks">
-           <property name="contextMenuPolicy">
-            <enum>Qt::CustomContextMenu</enum>
-           </property>
-           <property name="editTriggers">
-            <set>QAbstractItemView::NoEditTriggers</set>
-           </property>
-           <property name="selectionMode">
-            <enum>QAbstractItemView::MultiSelection</enum>
-           </property>
-           <property name="selectionBehavior">
-            <enum>QAbstractItemView::SelectRows</enum>
-           </property>
-           <column>
-            <property name="text">
-             <string>Task Name</string>
-            </property>
-           </column>
-           <column>
-            <property name="text">
-             <string>Pages At</string>
-            </property>
-           </column>
-           <column>
-            <property name="text">
-             <string>Job Found</string>
-            </property>
-           </column>
-           <column>
-            <property name="text">
-             <string>Status</string>
-            </property>
-           </column>
-          </widget>
-         </item>
-         <item>
           <widget class="QLabel" name="label_4">
            <property name="text">
             <string>Tips: Tasks can be selected and further operation available in context menu, to do a batch operation, just select multiple rows at once</string>

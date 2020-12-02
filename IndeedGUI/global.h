@@ -1,5 +1,7 @@
 #pragma once
 
+#define EXTERN_DLL_EXPORT extern "C" __declspec(dllexport)
+
 using namespace std;
 #include <Windows.h>
 #include <string>
@@ -17,14 +19,19 @@ using namespace std;
 #include <QMessageBox>
 #include <QInputDialog>
 #include <QSet>
+#include "Model_TasksTable.h"
 #include "RequestMgr.h"
 #include "Config.h"
+
+EXTERN_DLL_EXPORT void AddLog(char* Msg);
+
 extern Config config;
 extern RequestMgr requestMgr;
+extern QQueue 
 
 #include "Util.h"
 
-#define EXTERN_DLL_EXPORT extern "C" __declspec(dllexport)
+
 
 #include "TaskMgr.h"
 extern TaskMgr taskMgr;
