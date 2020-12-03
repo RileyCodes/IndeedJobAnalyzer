@@ -100,4 +100,24 @@ void RequestMgr::StartTask(QString taskName, QString url)
 	auto response = DoRequest(msgJson);
 }
 
+void RequestMgr::StopTask(QString taskName)
+{
+	QJsonObject msgJson;
+	msgJson["type"] = MsgStopTask;
+	msgJson["taskName"] = taskName;
+
+	auto response = DoRequest(msgJson);
+}
+
+
+void RequestMgr::RestartTask(QString taskName,QString url)
+{
+	QJsonObject msgJson;
+	msgJson["type"] = MsgRestartTask;
+	msgJson["taskName"] = taskName;
+	msgJson["url"] = url;
+	
+	auto response = DoRequest(msgJson);
+}
+
 

@@ -20,13 +20,22 @@ namespace IndeedJobMarketAnalyzer
             if (TasksToRun.Count == 0)
                 return;
 
-            var tasks = TasksToRun.Where(task => 
-                task.status == AnalyzeTask.Status.INIT);
+            IEnumerable<AnalyzeTask> tasks = null;
 
-            foreach (var task in tasks)
+            do
             {
-                task.status = await task.Run() ? AnalyzeTask.Status.COMPLETED : AnalyzeTask.Status.FAILED;
-            }
+                tasks = TasksToRun.Values.Where(task =>
+                    task.status == AnalyzeTask.Status.Initialized);
+
+                //we make a temporary list here to prevent exception when TasksToRun changed
+                var tmpList = tasks?.ToList();
+                foreach (var task in tmpList)
+                {
+                    await task.TryRun();
+                }
+
+            } while (tasks.Any());
+
 
             IsRunTaskTRLive = false;
         }
@@ -41,7 +50,7 @@ namespace IndeedJobMarketAnalyzer
                 Thread.Sleep(100);
                 List<AnalyzeTask.TaskInfo> taskInfos = new List<AnalyzeTask.TaskInfo>();
 
-                foreach (var analyzeTask in TasksToRun)
+                foreach (var analyzeTask in TasksToRun.Values.ToList())
                 {
                     taskInfos.Add(analyzeTask.GetTaskInfo());
                 }
@@ -63,7 +72,7 @@ namespace IndeedJobMarketAnalyzer
         }
 
 
-        static List<AnalyzeTask> TasksToRun = new List<AnalyzeTask>();
+        static Dictionary<string, AnalyzeTask> TasksToRun =  new Dictionary<string, AnalyzeTask>();
 
         static void EnsureSingletonTaskThreadStarted()
         {
@@ -76,16 +85,27 @@ namespace IndeedJobMarketAnalyzer
             runTaskTR.Start();
         }
 
-        public static void NewTask(string taskName, string url)
+        public static void StartTask(string taskName, string url, bool reset = false)
         {
             Config config = new Config();
             config.SearchStartUrl = url;
             config.TaskFileName = taskName;
+            config.reset = reset;
             AnalyzeTask analyzeTask= new AnalyzeTask(config);
 
-            TasksToRun.Add(analyzeTask);
+            TasksToRun[taskName] = analyzeTask;
 
             EnsureSingletonTaskThreadStarted();
+        }
+
+        public static void StopTask(string taskName)
+        {
+            if (!TasksToRun.ContainsKey(taskName))
+            {
+                return;
+            }
+
+            TasksToRun[taskName]?.Stop();
         }
     }
 }

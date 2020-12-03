@@ -59,7 +59,7 @@ void DialogNewTask::StartClicked()
 	progressBarDialog.show();
 	pRequestMgr->StartTask(taskName, url);
 	progressBarDialog.close();
-
+	this->close();
 }
 
 void DialogNewTask::CloseClicked()

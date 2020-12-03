@@ -11,7 +11,10 @@ namespace IndeedJobMarketAnalyzer
         public enum MsgType
         {
             MsgStartTask,
-            Test
+            MsgTest,
+            MsgRestartTask,
+            MsgStopTask,
+            MsgRerunTask
         };
 
         public struct Msg

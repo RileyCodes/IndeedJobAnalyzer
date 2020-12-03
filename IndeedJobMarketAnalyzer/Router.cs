@@ -27,8 +27,14 @@ namespace IndeedJobMarketAnalyzer
                 case MsgType.MsgStartTask:
                     OnMsgStartTask();
                     break;
-                case MsgType.Test:
+                case MsgType.MsgTest:
                     OnTest();
+                    break;
+                case MsgType.MsgRestartTask:
+                    OnMsgRestartTask();
+                    break;
+                case MsgType.MsgStopTask:
+                    OnMsgStopTask();
                     break;
             }
         }
@@ -43,9 +49,27 @@ namespace IndeedJobMarketAnalyzer
             string taskName = JsonReq["taskName"];
             string url = JsonReq["url"];
 
-            TaskMgr.NewTask(taskName,url);
+            TaskMgr.StartTask(taskName,url);
             DoResponse("");
         }
+
+
+        private void OnMsgStopTask()
+        {
+            string taskName = JsonReq["taskName"];
+            TaskMgr.StopTask(taskName);
+            DoResponse("");
+        }
+
+        private void OnMsgRestartTask()
+        {
+            string taskName = JsonReq["taskName"];
+            string url = JsonReq["url"];
+
+            TaskMgr.StartTask(taskName, url,true);
+            DoResponse("");
+        }
+
 
         void DoResponse(string res)
         {

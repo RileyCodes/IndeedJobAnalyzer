@@ -3,6 +3,17 @@
 #define EXTERN_DLL_EXPORT extern "C" __declspec(dllexport)
 
 
+enum class Status
+{
+    Initialized,
+    Running,
+    Completed,
+    Failed,
+    Stopping,
+	Saved
+};
+
+
 using namespace std;
 #include <Windows.h>
 #include <string>

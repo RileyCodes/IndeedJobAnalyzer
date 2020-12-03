@@ -24,7 +24,12 @@ public:
 	{
 		tableToBind->setModel(&model);
 	}
-	
+
+
+	void UpdateRunningTasksInfo(QString runningTasksJson)
+	{
+		model.UpdateRunningTasksInfo(runningTasksJson);
+	}
 	
 	bool EnsureTaskFolderCreated();
 	void StartTask(string taskName, string url);

@@ -6,8 +6,9 @@ namespace IndeedJobMarketAnalyzer
 {
     class Config
     {
-        public  string SearchStartUrl = "";
+        public string SearchStartUrl = "";
         public string TaskFileName = null;
+        public bool reset;
 
         public const string TaskDir = @"./Tasks/";
 

@@ -25,7 +25,7 @@ EXTERN_DLL_EXPORT int StartQT()
 	int dummyArgc = 0;
 	QApplication app(dummyArgc, nullptr);
 	InitAllGlobalQObjects();
-	
+
 	IndeedGUI mainWindow;
 	pMainWindow = &mainWindow;
 	pMainWindow->AddPendingLog();
@@ -51,7 +51,7 @@ EXTERN_DLL_EXPORT void* GetMsg()
 {
 	if (pRequestMgr == nullptr)
 		return nullptr;
-	
+
 	// msg is a reusable buffer that does not destroy during whole application life.
 	static Msg* msg = new Msg();
 	*msg = pRequestMgr->Dequeue();//copy current message to buffer
@@ -64,13 +64,13 @@ EXTERN_DLL_EXPORT void* GetMsg()
 
 EXTERN_DLL_EXPORT void AddLog(char* Log)
 {
-	if(!pMainWindow)
+	if (!pMainWindow)
 	{
 		//Add logs to pending buffer while GUI is not ready.
 		pendingLogMgr.AddPendingLog(Log);
 		return;
 	}
-	
+
 	QString qMsg = Log;
 	pMainWindow->AddLogWithMeta(qMsg);
 }
@@ -80,6 +80,5 @@ EXTERN_DLL_EXPORT void UpdateTaskInfo(char* TaskInfoJson)
 	if (!pMainWindow)
 		return;
 
-	QString qjson = TaskInfoJson;
 	pMainWindow->UpdateTaskInfo(TaskInfoJson);
 }

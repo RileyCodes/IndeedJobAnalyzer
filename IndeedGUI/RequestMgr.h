@@ -6,7 +6,10 @@ class RequestMgr;
 enum MsgType
 {
 	MsgStartTask,
-	MsgTest
+	MsgTest,
+	MsgRestartTask,
+	MsgStopTask,
+	MsgRerunTask
 };
 
 class Msg
@@ -84,6 +87,7 @@ public:
 	QString DoRequest(QJsonObject& msgJsonObj);
 	QString GetReponseSync(int req);
 	void StartTask(QString taskName, QString url);
-
+	void StopTask(QString taskName);
+	void RestartTask(QString taskName, QString url);
 };
 

@@ -17,15 +17,19 @@ namespace IndeedJobMarketAnalyzer
     {
         public enum Status
         {
-            INIT,
-            RUNNING,
-            COMPLETED,
-            FAILED
+            Initialized,
+            Running,
+            Completed,
+            Failed,
+            Stopping
         }
 
-        public Status status = Status.INIT;
+        public Status status = Status.Initialized;
 
         private Config config;
+
+        public string taskName => config.TaskFileName;
+
         private Browser browser = null;
         //private Dictionary<string,List<JobData>> JobdataByKeyword = new Dictionary<string, List<JobData>>();
         
@@ -33,7 +37,7 @@ namespace IndeedJobMarketAnalyzer
         //private List<JobData> JobDatasFailed = new List<JobData>();
 
         private Dictionary<string,JobData> JobdataByTitleAndCompany = new Dictionary<string, JobData>();
-        private int _pageCount = 0;
+        private int _pageCount = 1;
         private bool _needStop = false;
         private bool _stopped = true;
         private string currentUrl = "";
@@ -75,16 +79,20 @@ namespace IndeedJobMarketAnalyzer
         public void Stop()
         {
             _needStop = true;
-            while(!_stopped)
-                Thread.Sleep(5);
+
+            status = _stopped ? Status.Completed : Status.Stopping;
+
+            //while(!_stopped)
+            //    Thread.Sleep(5);
         }
         
         public struct TaskInfo
         {
             public string TaskName;
-            public int JobDownloadedCount;
-            public int Status;
-            public int PageAt;
+            public int JobCount;
+            public String Status;
+            public int PagesAt;
+            public string Url;
         }
         
         public TaskInfo GetTaskInfo()
@@ -92,9 +100,10 @@ namespace IndeedJobMarketAnalyzer
             TaskInfo taskInfo = new TaskInfo()
             {
                 TaskName = config.TaskFileName, 
-                JobDownloadedCount = JobdataByTitleAndCompany.Count,
-                Status = (int)status,
-                PageAt = _pageCount
+                JobCount = JobdataByTitleAndCompany.Count,
+                Status = status.ToString(),
+                PagesAt = _pageCount,
+                Url = currentUrl
             };
 
             return taskInfo;
@@ -163,15 +172,38 @@ namespace IndeedJobMarketAnalyzer
                 JobdataByTitleAndCompany[jobData.UniqueIdentifier] = jobData;
             }
         }
-        
-        public async Task<bool> Run()
-        {
-            if (!TryLoadTaskData()) return false;
 
+        public async Task<bool> TryRun()
+        {
+            status = await Run() ? Status.Completed : Status.Failed;
+            _stopped = true;
+            return status == Status.Completed;
+        }
+        
+        private async Task<bool> Run()
+        {
+            if (_needStop)
+            {
+                status = Status.Completed;
+                return true;
+            }
             _stopped = false;
+
+            if (!config.reset)
+            {
+                if (!TryLoadTaskData())
+                {
+                    return false;
+                }
+            }
+
+
+            
             //await new BrowserFetcher().DownloadAsync(BrowserFetcher.DefaultRevision);
 
             currentUrl = config.SearchStartUrl;
+            status = Status.Running;
+
             for (;;)
             {
                 try
@@ -188,10 +220,7 @@ namespace IndeedJobMarketAnalyzer
 
                     for (;;)
                     {
-                        if (_needStop)
-                        {
-                            throw new UserStoppedException();
-                        }
+                        CheckNeedStop();
 
                         var jobDatas = await GetJobDatas(page);
                         await ProcessAllJobDatasInCurrentPage(jobDatas, page);
@@ -200,9 +229,7 @@ namespace IndeedJobMarketAnalyzer
                         if (!await TryGotoNextPage(nextPageResult, page))
                         {
                             //False == at end of all pages
-                            _stopped = true;
-                            Save();
-                            return true;
+                            return OnTaskEnded();
                         }
 
                         await page.WaitForSelectorAsync("html");
@@ -212,26 +239,45 @@ namespace IndeedJobMarketAnalyzer
                 catch (UserStoppedException userStoppedException)
                 {
                     LogMgr.Log("AnalyzeTask stopped by user.");
-                    _needStop = false;
-                    _stopped = true;
-                    Save();
+                    return OnTaskEnded();
                 }
                 catch (Exception e)
                 {
                     LogMgr.Log("an error occurred: " + e.Message + " at:" + e.StackTrace);
-                    try
-                    {
-                        await browser.CloseAsync();
-                    }
-                    catch (Exception exception)
-                    {
-                        //ignore all exception, if it fails it fails.
-                    }
+                    await CloseBrowserIgnoreAllErr();
                 }
             }
 
             LogMgr.Log("error: unexpected execution path");
             return false;
+        }
+
+        private void CheckNeedStop()
+        {
+            if (_needStop)
+            {
+                throw new UserStoppedException();
+            }
+        }
+
+        private async Task CloseBrowserIgnoreAllErr()
+        {
+            try
+            {
+                await browser.CloseAsync();
+            }
+            catch (Exception exception)
+            {
+                //ignore all exception, if it fails it fails.
+            }
+        }
+
+        private bool OnTaskEnded()
+        {
+            Save();
+            _needStop = false;
+            CloseBrowserIgnoreAllErr(); //no need to wait
+            return true;
         }
 
         private bool TryLoadTaskData()
@@ -306,12 +352,12 @@ namespace IndeedJobMarketAnalyzer
                         Thread.Sleep(1000);
                         _pageCount++;
 
-#if DEBUG
-                        if (_pageCount >= 2)//only do two pages in debug mode.
-                        {
-                            return false;
-                        }
-#endif
+//#if DEBUG
+//                        if (_pageCount >= 2)//only do two pages in debug mode.
+//                        {
+//                            return false;
+//                        }
+//#endif
 
                         return true;
                     default:
@@ -326,6 +372,8 @@ namespace IndeedJobMarketAnalyzer
         {
             for(var i=0; i  < jobDatas.Count; i++)
             {
+                CheckNeedStop();
+
                 var jobData = jobDatas[i];
                 LogMgr.Log("Processing: " + jobData.JobTitle);
 
@@ -368,24 +416,6 @@ namespace IndeedJobMarketAnalyzer
         private void ProcessJobDesc(string innerText,JobData jobData)
         {
             jobData.JobDesc = innerText;
-
-            //bool IsFoundKeyword = false;
-            //foreach (var keyword in config.TechKeyword)
-            //{
-
-            //    if (innerText.Contains(keyword))
-            //    {
-            //        JobdataByKeyword[keyword].Add(jobData);
-            //    }
-
-            //    IsFoundKeyword = true;
-            //}
-
-            //if (!IsFoundKeyword)
-            //{
-            //    JobdataByKeyword["NoKeyword"].Add(jobData);
-            //}
-
             jobData.JobStatus = JobStatus.Complete;
             JobDatas.Add(jobData);
 

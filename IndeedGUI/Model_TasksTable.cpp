@@ -3,28 +3,70 @@
 
 #define COL_COUNT_TASKS 4
 
-Model_TasksTable::Model_TasksTable(QObject* parent)
+bool Model_TasksTable::BuildTaskRowDataFromJson(QJsonObject objTaskInfo, TaskRowData& taskInfo)
 {
+	if (!objTaskInfo["TaskName"].isString())
+		return true;
+	taskInfo.TaskName = objTaskInfo["TaskName"].toString();
+
+	if (!objTaskInfo["Url"].isString())
+		return true;
+	taskInfo.Url = objTaskInfo["Url"].toString();
+
+	if (objTaskInfo["JobCount"].isNull())
+		return true;
+	taskInfo.JobCount = QString::number(objTaskInfo["JobCount"].toInt());
+
+	if (objTaskInfo["PagesAt"].isNull())
+		return true;
+	taskInfo.PagesAt = QString::number(objTaskInfo["PagesAt"].toInt());
+
+	if (!objTaskInfo["Status"].isNull())
+		taskInfo.Status = objTaskInfo["Status"].toString();
+	
+	return false;
 }
 
-void Model_TasksTable::populateData(const QList<TaskRowData>& tasksData)
+void Model_TasksTable::LoadTasksFromDisk()
 {
-	tasksTableData.append(tasksData);
-	emit dataChanged(index(0, 0), index(10, 10));
+	const QDir directory(pConfig->TaskFolderName);
+	auto tasks = directory.entryList(QDir::Files);
+	foreach(QString filename, tasks)
+	{
+		QFile file(pConfig->TaskFolderName + filename);
+		if (!file.open(QIODevice::ReadOnly))
+		{
+			continue;
+		}
+
+		QTextStream in(&file);
+		auto qTaskJsonStr = in.readAll();
+		auto jsonDoc = QJsonDocument::fromJson(qTaskJsonStr.toUtf8());
+		auto objTaskInfo = jsonDoc.object();
+
+		TaskRowData taskRowData;
+
+		if (BuildTaskRowDataFromJson(objTaskInfo, taskRowData)) continue;
+
+		taskRowData.Status = "Saved";
+
+		taskInfos[taskRowData.TaskName] = taskRowData;
+	}
 	emit layoutChanged();
 }
+
+Model_TasksTable::Model_TasksTable(QObject* parent)
+{
+	
+}
+
+
 
 
 int Model_TasksTable::rowCount(const QModelIndex& parent) const
 {
 	Q_UNUSED(parent);
-
-	QString ErrMsg = "Row count:";
-	ErrMsg += QString::number(tasksTableData.count());
-
-	AddLog(const_cast<char*>(ErrMsg.toStdString().c_str()));
-	
-	return tasksTableData.count();
+	return taskInfos.count();
 }
 
 int Model_TasksTable::columnCount(const QModelIndex& parent) const
@@ -39,27 +81,28 @@ QVariant Model_TasksTable::data(const QModelIndex& index, int role) const
 		return QVariant();
 	}
 
-	if (tasksTableData.length() < index.row())
+	if (taskInfos.count() < index.row())
 	{
 		QString ErrMsg = "Error: out of bounds in Model_TasksTable::data:";
 		ErrMsg += QString::number(index.row());
-
 		AddLog(const_cast<char*>(ErrMsg.toStdString().c_str()));
 		return QVariant();
 	}
 
-	auto test = index.row();
+	auto taskKeys = taskInfos.keys();
+
+	const auto keyToBeAccessed = taskKeys[index.row()];
 
 	switch (index.column())
 	{
 	case tableTasks_TaskName:
-		return tasksTableData[index.row()].TaskName;
+		return taskInfos[keyToBeAccessed].TaskName;
 	case tableTasks_PagesAt:
-		return tasksTableData[index.row()].PagesAt;
+		return taskInfos[keyToBeAccessed].PagesAt;
 	case tableTasks_JobCount:
-		return tasksTableData[index.row()].JobCount;
+		return taskInfos[keyToBeAccessed].JobCount;
 	case tableTasks_Status:
-		return tasksTableData[index.row()].Status;
+		return taskInfos[keyToBeAccessed].Status;
 	}
 
 	return QVariant();
@@ -82,4 +125,30 @@ QVariant Model_TasksTable::headerData(int section, Qt::Orientation orientation, 
 		}
 	}
 	return QVariant();
+}
+
+void Model_TasksTable::UpdateRunningTasksInfo(QString runningTasksJson)
+{
+	auto taskInfoJsonDoc = QJsonDocument::fromJson(runningTasksJson.toUtf8());
+	auto listTaskInfos = taskInfoJsonDoc.array();
+
+	for (auto taskInfo : listTaskInfos)
+	{
+		auto objTaskInfo = taskInfo.toObject();
+
+		TaskRowData taskRowData;
+
+		if (BuildTaskRowDataFromJson(objTaskInfo, taskRowData)) continue;
+
+		taskInfos[taskRowData.TaskName] = taskRowData;
+	}
+
+	
+	emit layoutChanged();
+}
+
+TaskRowData Model_TasksTable::GetTaskRowDataByIndex(int rowIndex)
+{
+	auto keys = taskInfos.keys();
+	return taskInfos[keys[rowIndex]];
 }
