@@ -363,7 +363,7 @@ namespace IndeedJobMarketAnalyzer
                     default:
                         LogMgr.Log("Error while going to next page, Refresh...");
                         await page.ReloadAsync();
-                        break;
+                        return true;
                 }
             }
         }
@@ -393,6 +393,9 @@ namespace IndeedJobMarketAnalyzer
                     continue;
                 }
 
+                //Ensure page is load
+                await ViewJobPage.WaitForXPathAsync("/html/body/div[1]",
+                    new WaitForSelectorOptions(){Hidden = false,Timeout = 1000*10});
 
                 var res = await JSExecuter.JSExec(ViewJobPage, "GetJobDescription");
 
